@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behzad Tahmasebzadeh | Astrophysicist</title>
+<meta name="description" content="Behzad Tahmasebzadeh, computational astrophysicist at Villanova University: galaxy dynamics, supermassive black holes, barred galaxies, and the Blazhko effect in RR Lyrae stars.">
+<meta name="author" content="Behzad Tahmasebzadeh">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JJL83V7TRH"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JJL83V7TRH');
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Josefin+Sans:wght@100;200;300;400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #05060f;
+  --sidebar-bg: #e8e2d9;
+  --sidebar-w: 240px;
+  --gold: #c9a96e;
+  --gold-light: #e8d5a3;
+  --gold-dim: rgba(201,169,110,0.12);
+  --white: #f0ede8;
+  --muted: rgba(240,237,232,0.62);
+  --line: rgba(201,169,110,0.15);
+  --sidebar-text: #1a1714;
+  --sidebar-muted: #6b6560;
+  --sidebar-line: rgba(26,23,20,0.1);
+  --sidebar-active: #1a1714;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 17px;
+  line-height: 1.75;
+  cursor: none;
+  display: flex;
+}
+
+/* ── COMET CURSOR ── */
+#comet-canvas{position:fixed;inset:0;z-index:9999;pointer-events:none;}
+
+/* ── SLOW STAR CANVAS ── */
+#star-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* ── SIDEBAR ── */
+#sidebar {
+  position: fixed;
+  left:0; top:0; bottom:0;
+  width: var(--sidebar-w);
+  background: var(--sidebar-bg);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-brand {
+  padding: 2.2rem 1.8rem 2rem;
+  border-bottom: 1px solid var(--sidebar-line);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.brand-photo {
+  width: 172px; height: 172px;
+  border-radius: 10%;
+  overflow: hidden;
+  border: 2px solid rgba(26,23,20,0.12);
+  flex-shrink: 0;
+  background: #ccc8c0;
+  display: flex; align-items:center; justify-content:center;
+}
+.brand-photo img { width:100%; height:100%; object-fit:cover; filter:grayscale(10%); }
+.brand-photo-placeholder {
+  width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(135deg,#c8c3ba,#b8b3aa);
+}
+.brand-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem; font-weight: 500;
+  color: var(--sidebar-text); line-height: 1.25;
+}
+.brand-name em { font-style:italic; font-weight:300; }
+.brand-role {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.55rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--sidebar-muted);
+  margin-top: 0.3rem; line-height: 1.7;
+}
+
+.sidebar-nav {
+  flex: 1; padding: 1.8rem 0;
+  display: flex; flex-direction: column;
+}
+.nav-item {
+  display: flex; align-items: center;
+  padding: 0.9rem 1.8rem;
+  cursor: none; transition: background 0.22s;
+  position: relative; border: none;
+  background: none; width: 100%;
+  text-align: left; text-decoration: none;
+}
+.nav-item::after {
+  content: ''; position: absolute;
+  right: 0; top: 20%; bottom: 20%;
+  width: 2px; background: var(--sidebar-active);
+  transform: scaleY(0); transition: transform 0.25s;
+  border-radius: 2px 0 0 2px;
+}
+.nav-item:hover { background: rgba(26,23,20,0.05); }
+.nav-item.active { background: rgba(26,23,20,0.06); }
+.nav-item.active::after { transform: scaleY(1); }
+.nav-label {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.7rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--sidebar-muted);
+  transition: color 0.22s;
+}
+.nav-item:hover .nav-label { color: var(--sidebar-text); }
+.nav-item.active .nav-label { color: var(--sidebar-text); font-weight: 400; }
+
+.sidebar-footer {
+  padding: 1.4rem 1.8rem;
+  border-top: 1px solid var(--sidebar-line);
+}
+.sidebar-link {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.52rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--sidebar-muted);
+  text-decoration: none; cursor: none;
+  transition: color 0.2s; padding: 0.22rem 0; display: block;
+}
+.sidebar-link:hover { color: var(--sidebar-text); }
+
+/* ── MAIN ── */
+#main {
+  margin-left: var(--sidebar-w);
+  flex: 1; height: 100vh;
+  overflow: hidden; position: relative; z-index: 1;
+}
+
+/* ── PANELS ── */
+.panel {
+  position: absolute; inset: 0;
+  overflow-y: auto; overflow-x: hidden;
+  opacity: 0; transform: translateX(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+  scrollbar-width: thin; scrollbar-color: var(--line) transparent;
+}
+.panel.active { opacity:1; transform:translateX(0); pointer-events:all; }
+.panel.exit   { opacity:0; transform:translateX(-14px); }
+.panel::-webkit-scrollbar{width:3px;}
+.panel::-webkit-scrollbar-track{background:transparent;}
+.panel::-webkit-scrollbar-thumb{background:var(--line);}
+
+/* ── HOME PANEL ── */
+#panel-home {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+/* Simulation GIF banner */
+.sim-banner {
+  width: 100%;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  /* subtle fade at bottom edge so it blends into page */
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
+.sim-banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  max-height: 30vh;
+  object-position: center center;
+}
+/* placeholder shown when gif not found */
+.sim-placeholder {
+  width: 100%; height: 220px;
+  background: linear-gradient(180deg, #0a0f22 0%, #05060f 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0.6rem;
+  border-bottom: 1px solid var(--line);
+}
+.sim-placeholder-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.58rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* Home text block */
+.home-text {
+  padding: 2.5rem 6vw 4rem;
+  flex-shrink: 0;
+}
+.home-eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.3em;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.home-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.8rem,5vw,4.8rem);
+  font-weight: 300; line-height: 1.05; color: var(--white);
+}
+.home-name em { font-style:italic; color:var(--gold-light); }
+.home-role {
+  font-family: 'Josefin Sans', sans-serif;
+  font-weight: 100; font-size: clamp(0.7rem,1.1vw,0.85rem);
+  letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--muted); margin-top: 0.8rem;
+}
+.home-divider { width:44px; height:1px; background:var(--gold); margin:1.5rem 0; }
+.home-tagline {
+  font-size: 1rem; font-weight: 300; font-style: italic;
+  color: var(--muted); max-width: 420px; line-height: 1.7;
+}
+.home-cta { display:flex; gap:1rem; flex-wrap:wrap; margin-top:1.8rem; }
+
+/* ── OTHER PANELS ── */
+.panel-inner {
+  padding: 4.5rem 6vw 4rem;
+}
+.panel-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.56rem; letter-spacing: 0.35em;
+  color: var(--gold); text-transform: uppercase;
+  display: flex; align-items: center; gap: 0.8rem;
+  margin-bottom: 0.55rem;
+}
+.panel-label::before { content:''; width:20px; height:1px; background:var(--gold); }
+.panel-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem,4vw,3rem);
+  font-weight: 300; line-height: 1.1;
+  margin-bottom: 2.5rem; color: var(--white);
+}
+.panel-title em { font-style:italic; color:var(--gold-light); }
+
+/* ── ABOUT ── */
+.about-grid { display:grid; grid-template-columns:auto 1fr; gap:3.5rem; align-items:start; }
+.about-photo-wrap { width:200px; }
+.photo-frame { position:relative; }
+.photo-frame::before { content:''; position:absolute; inset:-9px -9px 9px 9px; border:1px solid var(--line); z-index:0; }
+.photo-frame::after  { content:''; position:absolute; inset:9px -9px -9px 9px; background:var(--gold-dim); z-index:0; }
+.photo-frame img { position:relative; z-index:1; width:100%; display:block; filter:grayscale(15%) contrast(1.05); }
+.photo-placeholder {
+  position:relative; z-index:1; width:100%; aspect-ratio:3/4;
+  background:linear-gradient(135deg,#0d1225,#141b35,#0a1020);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:0.7rem; color:var(--muted);
+  font-family:'Space Mono',monospace; font-size:0.52rem; letter-spacing:0.15em; text-align:center;
+}
+.about-text p { color:var(--muted); margin-bottom:0.9rem; font-size:1rem; }
+.about-text p:first-of-type { color:var(--white); font-size:1.06rem; }
+
+/* ── RESEARCH ── */
+.interest-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:3rem;
+}
+.interest-card { background:var(--bg); padding:1.5rem 1.3rem; position:relative; overflow:hidden; transition:background 0.3s; }
+.interest-card::before { content:''; position:absolute; top:0; left:0; width:2px; height:0; background:var(--gold); transition:height 0.35s; }
+.interest-card:hover { background:#0b0f22; }
+.interest-card:hover::before { height:100%; }
+.int-icon { font-size:1.2rem; margin-bottom:0.65rem; display:block; }
+.int-title { font-family:'Josefin Sans',sans-serif; font-size:0.64rem; letter-spacing:0.13em; text-transform:uppercase; color:var(--gold-light); margin-bottom:0.4rem; }
+.int-desc { font-size:0.86rem; color:var(--muted); line-height:1.55; }
+.proj-label { font-family:'Cormorant Garamond',serif; font-size:1.35rem; font-weight:400; font-style:italic; color:var(--white); margin-bottom:1.4rem; }
+.proj-list { list-style:none; }
+.proj-item { display:flex; gap:1.1rem; align-items:flex-start; padding:1.1rem 0; border-bottom:1px solid var(--line); }
+.proj-num { font-family:'Space Mono',monospace; font-size:0.55rem; color:var(--gold); opacity:0.55; flex-shrink:0; margin-top:0.2rem; }
+.proj-text { font-size:0.93rem; color:var(--muted); }
+
+/* ── PUBLICATIONS ── */
+.pub-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:0.85rem; }
+.pub-card { display:flex; flex-direction:column; padding:1.5rem 1.3rem; border:1px solid var(--line); text-decoration:none; transition:background 0.3s,border-color 0.3s,transform 0.2s; cursor:none; }
+.pub-card:hover { background:var(--gold-dim); border-color:var(--gold); transform:translateY(-3px); }
+.pub-icon { font-size:1.3rem; margin-bottom:0.7rem; }
+.pub-name { font-family:'Josefin Sans',sans-serif; font-size:0.64rem; letter-spacing:0.13em; text-transform:uppercase; color:var(--gold-light); margin-bottom:0.3rem; }
+.pub-desc { font-size:0.83rem; color:var(--muted); }
+
+/* ── CV ── */
+.cv-cols { display:grid; grid-template-columns:1fr 1fr; gap:3rem; }
+.cv-section-title { font-family:'Josefin Sans',sans-serif; font-size:0.62rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:1.5rem; display:flex; align-items:center; gap:0.8rem; }
+.cv-section-title::after { content:''; flex:1; height:1px; background:var(--line); }
+.cv-item { padding:1.1rem 0; border-bottom:1px solid var(--line); }
+.cv-year { font-family:'Space Mono',monospace; font-size:0.55rem; color:var(--gold); letter-spacing:0.1em; margin-bottom:0.25rem; }
+.cv-role { font-family:'Cormorant Garamond',serif; font-size:1.05rem; color:var(--white); margin-bottom:0.12rem; }
+.cv-place { font-size:0.86rem; color:var(--muted); font-style:italic; }
+.cv-btns { display:flex; gap:0.9rem; flex-wrap:wrap; margin-top:2.2rem; }
+.cv-note { font-family:'Space Mono',monospace; font-size:0.52rem; color:var(--muted); letter-spacing:0.09em; margin-top:0.9rem; }
+
+/* ── CONTACT ── */
+.contact-cols { display:grid; grid-template-columns:1fr 1.1fr; gap:4rem; }
+.contact-intro { font-size:0.98rem; color:var(--muted); margin-bottom:1.8rem; }
+.c-item { display:flex; align-items:flex-start; gap:0.85rem; margin-bottom:1.2rem; }
+.c-icon { width:32px; height:32px; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:0.85rem; flex-shrink:0; }
+.c-lbl { font-family:'Josefin Sans',sans-serif; font-size:0.56rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+.c-val { color:var(--gold-light); font-size:0.9rem; text-decoration:none; }
+.c-socials { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:1.8rem; }
+.c-social { font-family:'Josefin Sans',sans-serif; font-size:0.56rem; letter-spacing:0.13em; text-transform:uppercase; color:var(--muted); text-decoration:none; border:1px solid var(--line); padding:0.45rem 0.85rem; transition:color 0.22s,border-color 0.22s; cursor:none; }
+.c-social:hover { color:var(--gold); border-color:var(--gold); }
+.contact-form { display:flex; flex-direction:column; gap:0.95rem; }
+.f-grp { display:flex; flex-direction:column; gap:0.3rem; }
+.f-lbl { font-family:'Josefin Sans',sans-serif; font-size:0.56rem; letter-spacing:0.17em; text-transform:uppercase; color:var(--muted); }
+.f-inp,.f-ta { background:transparent; border:1px solid var(--line); color:var(--white); font-family:'Cormorant Garamond',serif; font-size:0.97rem; padding:0.65rem 0.85rem; outline:none; transition:border-color 0.22s; resize:vertical; cursor:none; }
+.f-inp:focus,.f-ta:focus { border-color:var(--gold); }
+.f-ta { min-height:110px; }
+
+/* ── SELECTED PAPERS / HIGHLIGHTS ── */
+.pub-stats { font-family:'Space Mono',monospace; font-size:0.58rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin-bottom:1.2rem; }
+.paper-list { list-style:none; margin-bottom:3rem; }
+.paper { padding:1rem 0; border-bottom:1px solid var(--line); }
+.paper-title { color:var(--white); font-size:1.02rem; line-height:1.4; }
+.paper-title a { color:inherit; text-decoration:none; cursor:none; transition:color .2s; }
+.paper-title a:hover { color:var(--gold-light); }
+.paper-meta { font-size:0.86rem; color:var(--muted); font-style:italic; }
+.paper-tag { font-family:'Space Mono',monospace; font-style:normal; font-size:0.5rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); border:1px solid var(--line); padding:0.1rem 0.4rem; margin-left:0.4rem; white-space:nowrap; }
+.proj-text strong { color:var(--white); font-weight:500; }
+
+/* ── BUTTONS ── */
+.btn { font-family:'Josefin Sans',sans-serif; font-size:0.63rem; letter-spacing:0.18em; text-transform:uppercase; padding:0.75rem 1.8rem; text-decoration:none; transition:all 0.22s; cursor:none; display:inline-block; border:none; }
+.btn-gold { background:var(--gold); color:var(--bg); }
+.btn-gold:hover { background:var(--gold-light); }
+.btn-outline { background:transparent; border:1px solid var(--line); color:var(--gold); }
+.btn-outline:hover { border-color:var(--gold); color:var(--gold-light); }
+
+/* ── MOBILE ── */
+@media(max-width:640px){
+  :root{--sidebar-w:0px;}
+  #sidebar{transform:translateX(-240px);width:240px;transition:transform .3s;}
+  #sidebar.open{transform:translateX(0);}
+  #menu-btn{display:flex;}
+  #main{margin-left:0;}
+  .about-grid,.cv-cols,.contact-cols{grid-template-columns:1fr;}
+  .about-photo-wrap{width:160px;}
+}
+@media (hover:none),(pointer:coarse){
+  body,.nav-item,.btn,.pub-card,.c-social,.sidebar-link,.f-inp,.f-ta,.paper-title a,#menu-btn{cursor:auto;}
+  #comet-canvas{display:none;}
+}
+#menu-btn{display:none;position:fixed;top:1rem;left:1rem;z-index:200;width:36px;height:36px;background:var(--sidebar-bg);border:none;align-items:center;justify-content:center;cursor:none;flex-direction:column;gap:5px;padding:8px;}
+#menu-btn span{display:block;width:100%;height:1px;background:var(--sidebar-text);}
+</style>
+</head>
+<body>
+
+<canvas id="comet-canvas"></canvas>
+<canvas id="star-canvas"></canvas>
+
+<button id="menu-btn" onclick="toggleSidebar()" aria-label="Menu">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-photo">
+      <img src="images/photo_BT.jpg" alt="Behzad Tahmasebzadeh"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="brand-photo-placeholder" style="display:none;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6b6560" stroke-width="1.2">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </div>
+    </div>
+    <div class="brand-text">
+      <div class="brand-name">Behzad<br><em>Tahmasebzadeh</em></div>
+      <div class="brand-role">Computational Astrophysicist<br>Villanova University</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <button class="nav-item active" onclick="showPanel('home',this)"><span class="nav-label">Home</span></button>
+    <button class="nav-item" onclick="showPanel('about',this)"><span class="nav-label">About Me</span></button>
+    <button class="nav-item" onclick="showPanel('research',this)"><span class="nav-label">Research</span></button>
+    <button class="nav-item" onclick="showPanel('publications',this)"><span class="nav-label">Publications</span></button>
+    <button class="nav-item" onclick="showPanel('cv',this)"><span class="nav-label">CV</span></button>
+    <button class="nav-item" onclick="showPanel('contact',this)"><span class="nav-label">Contact</span></button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="https://www.linkedin.com/in/behzad-tahmasebzadeh-41613789/" class="sidebar-link" target="_blank">LinkedIn</a>
+    <a href="https://twitter.com/BTahmasebzadeh" class="sidebar-link" target="_blank">Twitter / X</a>
+    <a href="https://scholar.google.com/citations?user=iItKPo8AAAAJ&hl=en" class="sidebar-link" target="_blank">Google Scholar</a>
+    <a href="https://orcid.org/0000-0002-1584-2281" class="sidebar-link" target="_blank">ORCID</a>
+    <a href="https://ui.adsabs.harvard.edu/search/q=author%3A%22Tahmasebzadeh%2C%20Behzad%22" class="sidebar-link" target="_blank">NASA ADS</a>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<main id="main">
+
+  <!-- HOME -->
+  <div class="panel active" id="panel-home">
+
+    <!-- Simulation GIF banner -->
+    <div class="sim-banner">
+      <img
+        src="images/simulation.gif"
+        alt="Galaxy simulation"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <!-- Shown only when gif is missing -->
+      <div class="sim-placeholder" style="display:none;">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(201,169,110,0.4)" stroke-width="1">
+          <circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18"/><path d="M3 12h18"/>
+        </svg>
+        <span class="sim-placeholder-label">Place simulation gif at images/simulation.gif</span>
+      </div>
+    </div>
+
+    <!-- Text -->
+    <div class="home-text">
+      <div class="home-eyebrow">Postdoctoral Fellow &amp; Instructor · Villanova University</div>
+      <h1 class="home-name">Behzad<br><em>Tahmasebzadeh</em></h1>
+      <p class="home-role">Computational Astrophysicist</p>
+      <div class="home-divider"></div>
+      <p class="home-tagline">I build dynamical and physical models and fit them to high-quality data to measure what cannot be observed directly — from the black holes at the hearts of galaxies to the modulated pulsations of RR Lyrae stars.</p>
+      <div class="home-cta">
+        <button class="btn btn-gold" onclick="showPanelByName('research')">Explore Research</button>
+        <button class="btn btn-outline" onclick="showPanelByName('cv')">View CV</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="panel" id="panel-about">
+    <div class="panel-inner">
+      <div class="panel-label">About Me</div>
+      <h2 class="panel-title">Galaxies, Black Holes<br>&amp; <em>Variable Stars</em></h2>
+      <div class="about-grid">
+        <div class="about-photo-wrap">
+          <div class="photo-frame">
+            <img src="images/me2.jpg" alt="Behzad Tahmasebzadeh"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="photo-placeholder" style="display:none;">
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.35"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <span>Behzad Tahmasebzadeh</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-text">
+          <p>I am a computational astrophysicist and a Postdoctoral Fellow and Instructor (MSE Fellowship) in the Department of Astrophysics and Planetary Science at Villanova University.</p>
+          <p>I develop dynamical and physical models and fit them to high-quality data. From stellar kinematics, I measure the masses of central black holes and recover the orbital structure of galactic bars. From the light curves of RR Lyrae stars, I study the physical origin of the Blazhko effect.</p>
+          <p>I am a core developer of the open-source orbit-superposition code DYNAMITE. Before Villanova, I was a postdoctoral research fellow at the University of Michigan. I received my Ph.D. in astrophysics from the Shanghai Astronomical Observatory, Chinese Academy of Sciences.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESEARCH -->
+  <div class="panel" id="panel-research">
+    <div class="panel-inner">
+      <div class="panel-label">Research</div>
+      <h2 class="panel-title">Areas of <em>Inquiry</em></h2>
+      <div class="interest-grid">
+        <div class="interest-card"><span class="int-icon">⚫</span><div class="int-title">Supermassive Black Holes</div><div class="int-desc">Dynamical black-hole masses in compact and low-mass galaxies with JWST/NIRSpec IFU kinematics, and what double nuclei reveal about black-hole mergers.</div></div>
+        <div class="interest-card"><span class="int-icon">🌀</span><div class="int-title">Barred Galaxy Dynamics</div><div class="int-desc">Orbit-superposition (Schwarzschild) models of barred galaxies, applied to VLT/MUSE integral-field data from the TIMER survey: orbital structure, bulges and pattern speeds.</div></div>
+        <div class="interest-card"><span class="int-icon">✨</span><div class="int-title">Time-Domain Astronomy</div><div class="int-desc">The century-old Blazhko effect in RR Lyrae stars, studied with time–frequency analysis of Kepler, TESS and Rubin/LSST light curves.</div></div>
+        <div class="interest-card"><span class="int-icon">💻</span><div class="int-title">Computational Astrophysics</div><div class="int-desc">Open-source modeling software, high-performance computing, and the analysis of large survey datasets.</div></div>
+      </div>
+      <p class="proj-label">Highlights</p>
+      <ul class="proj-list">
+        <li class="proj-item"><span class="proj-num">01</span><span class="proj-text"><strong>A black hole in a tiny galaxy.</strong> My Schwarzschild models gave the 3σ detection of a supermassive black hole in UCD 736, the smallest and least luminous ultra-compact dwarf galaxy known to host one.</span></li>
+        <li class="proj-item"><span class="proj-num">02</span><span class="proj-text"><strong>A double nucleus in NGC 4486B.</strong> With JWST, I found that the double nucleus around this overmassive black hole may be evidence of a recent binary black-hole merger and recoil. Both results were featured as AAS Nova Research Highlights.</span></li>
+        <li class="proj-item"><span class="proj-num">03</span><span class="proj-text"><strong>Modeling barred galaxies.</strong> I extended DYNAMITE to barred galaxies and applied these models to integral-field data for the first time.</span></li>
+        <li class="proj-item"><span class="proj-num">04</span><span class="proj-text"><strong>The Blazhko effect.</strong> Using Kepler light curves, I found long-term trends in RR Lyrae pulsation timing, and I am developing a physical model of the modulation fitted with MCMC.</span></li>
+        <li class="proj-item"><span class="proj-num">05</span><span class="proj-text"><strong>JWST Cycle 5 (PI).</strong> GO 9654: constraining the star-cluster environment of the intermediate-mass black hole candidate HLX-1.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PUBLICATIONS -->
+  <div class="panel" id="panel-publications">
+    <div class="panel-inner">
+      <div class="panel-label">Publications</div>
+      <h2 class="panel-title">Academic <em>Record</em></h2>
+      <p class="pub-stats">16 refereed papers · 9 first-author</p>
+      <p class="proj-label">Selected Papers</p>
+      <ul class="paper-list">
+        <li class="paper"><div class="paper-title"><a href="https://arxiv.org/abs/2512.14695" target="_blank" rel="noopener">JWST Observations of the Double Nucleus in NGC 4486B: Possible Evidence for a Recent Binary SMBH Merger and Recoil</a></div><div class="paper-meta">Tahmasebzadeh, Valluri, Dattathri, et al. 2026, ApJL, 1001, L14<span class="paper-tag">AAS Nova</span></div></li>
+        <li class="paper"><div class="paper-title"><a href="https://arxiv.org/abs/2505.14676" target="_blank" rel="noopener">A JWST View of the Overmassive Black Hole in NGC 4486B</a></div><div class="paper-meta">Tahmasebzadeh, Taylor, et al. 2025, ApJL</div></li>
+        <li class="paper"><div class="paper-title"><a href="https://arxiv.org/abs/2503.00113" target="_blank" rel="noopener">A Supermassive Black Hole in a Diminutive Ultra-compact Dwarf Galaxy Discovered with JWST/NIRSpec+IFU</a></div><div class="paper-meta">Taylor, Tahmasebzadeh, et al. 2025, ApJ<span class="paper-tag">AAS Nova</span></div></li>
+        <li class="paper"><div class="paper-title"><a href="https://arxiv.org/abs/2408.02142" target="_blank" rel="noopener">The Lower Limit of Dynamical Black Hole Masses Detectable in Virgo Compact Stellar Systems Using the JWST/NIRSpec IFU</a></div><div class="paper-meta">Tahmasebzadeh, Lapeer, Vasiliev, et al. 2024, ApJ</div></li>
+        <li class="paper"><div class="paper-title"><a href="https://arxiv.org/abs/2409.03746" target="_blank" rel="noopener">Orbital Support and Evolution of CX/OX Structures in Boxy/Peanut Bars</a></div><div class="paper-meta">Tahmasebzadeh, Dattathri, Valluri, et al. 2024, ApJ</div></li>
+        <li class="paper"><div class="paper-title"><a href="https://arxiv.org/abs/2310.00497" target="_blank" rel="noopener">Schwarzschild Modeling of Barred S0 Galaxy NGC 4371</a></div><div class="paper-meta">Tahmasebzadeh, Zhu, Shen, et al. 2024, MNRAS</div></li>
+        <li class="paper"><div class="paper-title"><a href="https://arxiv.org/abs/2210.14218" target="_blank" rel="noopener">Orbit-superposition Dynamical Modeling of Barred Galaxies</a></div><div class="paper-meta">Tahmasebzadeh, Zhu, Shen, et al. 2022, ApJ</div></li>
+      </ul>
+      <p class="proj-label">Full List</p>
+      <div class="pub-grid">
+        <a class="pub-card" href="https://ui.adsabs.harvard.edu/search/q=author%3A(%22Tahmasebzadeh%2C%20Behzad%22)&sort=date%20desc" target="_blank" rel="noopener"><div class="pub-icon">🔭</div><div class="pub-name">NASA ADS</div><div class="pub-desc">Astrophysics Data System — complete list with citations</div></a>
+        <a class="pub-card" href="https://scholar.google.com/citations?user=iItKPo8AAAAJ&hl=en&oi=sra" target="_blank" rel="noopener"><div class="pub-icon">🎓</div><div class="pub-name">Google Scholar</div><div class="pub-desc">Profile with h-index and citation metrics</div></a>
+        <a class="pub-card" href="https://orcid.org/0000-0002-1584-2281" target="_blank" rel="noopener"><div class="pub-icon">🆔</div><div class="pub-name">ORCID</div><div class="pub-desc">Researcher ID 0000-0002-1584-2281</div></a>
+        <a class="pub-card" href="https://www.researchgate.net/profile/Behzad-Tahmasebzadeh" target="_blank" rel="noopener"><div class="pub-icon">🔬</div><div class="pub-name">ResearchGate</div><div class="pub-desc">Profile and full texts</div></a>
+        <a class="pub-card" href="https://github.com/dynamics-of-stellar-systems/dynamite" target="_blank" rel="noopener"><div class="pub-icon">💻</div><div class="pub-name">DYNAMITE</div><div class="pub-desc">Open-source orbit-superposition modeling code</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CV -->
+  <div class="panel" id="panel-cv">
+    <div class="panel-inner">
+      <div class="panel-label">Curriculum Vitae</div>
+      <h2 class="panel-title">Academic <em>Journey</em></h2>
+      <div class="cv-cols">
+        <div>
+          <div class="cv-section-title">Positions</div>
+          <div class="cv-item"><div class="cv-year">2025 – Present</div><div class="cv-role">Postdoctoral Fellow &amp; Instructor (MSE Fellowship)</div><div class="cv-place">Villanova University, Department of Astrophysics and Planetary Science</div></div>
+          <div class="cv-item"><div class="cv-year">2023 – 2025</div><div class="cv-role">Postdoctoral Research Fellow</div><div class="cv-place">University of Michigan, Department of Astronomy</div></div>
+          <div class="cv-item"><div class="cv-year">2017 – 2022</div><div class="cv-role">Graduate Research Assistant</div><div class="cv-place">Shanghai Astronomical Observatory, Chinese Academy of Sciences</div></div>
+          <div style="margin-top:2.2rem;">
+            <div class="cv-section-title">Education</div>
+            <div class="cv-item"><div class="cv-year">2022</div><div class="cv-role">Ph.D. in Astrophysics</div><div class="cv-place">Shanghai Astronomical Observatory, Chinese Academy of Sciences</div></div>
+            <div class="cv-item"><div class="cv-year">2016</div><div class="cv-role">M.Sc. in Astrophysics</div><div class="cv-place">Institute for Advanced Studies in Basic Sciences (IASBS), Zanjan, Iran</div></div>
+            <div class="cv-item"><div class="cv-year">2013</div><div class="cv-role">B.Sc. in Nuclear Physics</div><div class="cv-place">Bu-Ali Sina University, Hamedan, Iran</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="cv-section-title">Selected Honors &amp; Programs</div>
+          <div class="cv-item"><div class="cv-year">2026</div><div class="cv-role">PI, JWST Cycle 5 GO Program 9654</div><div class="cv-place">Star-cluster environment of the IMBH candidate HLX-1</div></div>
+          <div class="cv-item"><div class="cv-year">2025 – 2026</div><div class="cv-role">AAS Nova Research Highlights</div><div class="cv-place">UCD 736 black hole; NGC 4486B double nucleus</div></div>
+          <div class="cv-item"><div class="cv-year">2022</div><div class="cv-role">CAS Excellent International Student Prize</div><div class="cv-place">Chinese Academy of Sciences</div></div>
+          <div class="cv-item"><div class="cv-year">2017</div><div class="cv-role">CAS–TWAS Ph.D. Fellowship</div><div class="cv-place">Chinese Academy of Sciences &amp; The World Academy of Sciences</div></div>
+          <div style="margin-top:2.2rem;">
+            <div class="cv-section-title">Collaborations &amp; Service</div>
+            <div class="cv-item"><div class="cv-role">Collaborations</div><div class="cv-place">DYNAMITE development team · TIMER survey · LSST Discovery Alliance Catalyst Postdoctoral Alliance</div></div>
+            <div class="cv-item"><div class="cv-role">Review</div><div class="cv-place">Referee for ApJ, Astronomy and Computing, and New Astronomy · NASA grant review panelist</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cv-btns">
+        <a href="images/CV.pdf" class="btn btn-gold" download="Tahmasebzadeh_CV.pdf">Download Full CV (PDF)</a>
+        <a href="images/CV.pdf" class="btn btn-outline" target="_blank" rel="noopener">View in Browser</a>
+      </div>
+          </div>
+  </div>
+
+  <!-- CONTACT -->
+  <div class="panel" id="panel-contact">
+    <div class="panel-inner">
+      <div class="panel-label">Contact</div>
+      <h2 class="panel-title">Get in <em>Touch</em></h2>
+      <div class="contact-cols">
+        <div>
+          <p class="contact-intro">I welcome questions about my research, collaborations, and student projects in galaxy dynamics, black holes, and time-domain astronomy.</p>
+          <div class="c-item"><div class="c-icon">✉</div><div><div class="c-lbl">Email</div><a href="mailto:behzadtahmaseb@gmail.com" class="c-val">behzadtahmaseb@gmail.com</a></div></div>
+          <div class="c-item"><div class="c-icon">🏛</div><div><div class="c-lbl">Institution</div><span class="c-val">Villanova University<br>Department of Astrophysics and Planetary Science</span></div></div>
+          <div class="c-item"><div class="c-icon">📍</div><div><div class="c-lbl">Location</div><span class="c-val">Villanova, Pennsylvania, USA</span></div></div>
+          <div class="c-socials">
+            <a href="https://www.linkedin.com/in/behzad-tahmasebzadeh-41613789/" class="c-social" target="_blank">LinkedIn</a>
+            <a href="https://twitter.com/BTahmasebzadeh" class="c-social" target="_blank">Twitter/X</a>
+            <a href="https://scholar.google.com/citations?user=iItKPo8AAAAJ&hl=en" class="c-social" target="_blank">Scholar</a>
+            <a href="https://orcid.org/0000-0002-1584-2281" class="c-social" target="_blank">ORCID</a>
+          </div>
+        </div>
+        <form class="contact-form" onsubmit="submitForm(event)">
+          <div class="f-grp"><label class="f-lbl">Name</label><input class="f-inp" id="f-name" type="text" placeholder="Your name" required></div>
+          <div class="f-grp"><label class="f-lbl">Email</label><input class="f-inp" id="f-email" type="email" placeholder="your@email.com" required></div>
+          <div class="f-grp"><label class="f-lbl">Message</label><textarea class="f-ta" id="f-msg" placeholder="Your message…" required></textarea></div>
+          <button type="submit" class="btn btn-gold" style="align-self:flex-start;">Send Message</button>
+          <p id="form-msg" style="font-size:0.85rem;color:var(--gold);display:none;margin-top:0.4rem;"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+/* ── Comet cursor ── */
+const cometCV = document.getElementById('comet-canvas');
+const cometCX = cometCV.getContext('2d');
+function resizeComet(){ cometCV.width=window.innerWidth; cometCV.height=window.innerHeight; }
+resizeComet(); window.addEventListener('resize', resizeComet);
+
+let mx=0, my=0;
+document.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; });
+
+// Tail trail: ring buffer of past positions
+const TAIL = 28;
+const trail = Array.from({length:TAIL}, ()=>({x:0,y:0}));
+let trailHead = 0;
+
+// Draw a 5-point star
+function drawStar(cx, x, y, r, color){
+  cx.save();
+  cx.translate(x, y);
+  cx.beginPath();
+  for(let i=0;i<10;i++){
+    const angle = (i * Math.PI)/5 - Math.PI/2;
+    const radius = i%2===0 ? r : r*0.42;
+    cx.lineTo(Math.cos(angle)*radius, Math.sin(angle)*radius);
+  }
+  cx.closePath();
+  cx.fillStyle = color;
+  cx.fill();
+  cx.restore();
+}
+
+(function animComet(){
+  cometCV.width = cometCV.width; // clear
+
+  // Store current position in trail
+  trail[trailHead] = {x:mx, y:my};
+  trailHead = (trailHead+1) % TAIL;
+
+  // Draw tail — from oldest to newest, fading out
+  for(let i=0;i<TAIL-1;i++){
+    const idx = (trailHead + i) % TAIL;
+    const next = (trailHead + i + 1) % TAIL;
+    const t = i / (TAIL-1); // 0=oldest, 1=newest
+    const alpha = t * 0.55;
+    const width = t * 3.5 + 0.5;
+
+    cometCX.beginPath();
+    cometCX.moveTo(trail[idx].x, trail[idx].y);
+    cometCX.lineTo(trail[next].x, trail[next].y);
+    cometCX.strokeStyle = `rgba(201,169,110,${alpha})`;
+    cometCX.lineWidth = width;
+    cometCX.lineCap = 'round';
+    cometCX.stroke();
+  }
+
+  // Draw star head at current position
+  drawStar(cometCX, mx, my, 7, 'rgba(255,230,150,0.95)');
+  // Inner glow
+  drawStar(cometCX, mx, my, 4, 'rgba(255,255,220,1)');
+
+  requestAnimationFrame(animComet);
+})();
+
+/* ── Slow drifting starfield ── */
+const bgCV=document.getElementById('star-canvas'),bgCX=bgCV.getContext('2d');
+function resizeBG(){bgCV.width=window.innerWidth;bgCV.height=window.innerHeight;}
+resizeBG(); window.addEventListener('resize',resizeBG);
+const bgStars=Array.from({length:260},()=>({
+  x:Math.random()*window.innerWidth,
+  y:Math.random()*window.innerHeight,
+  r:Math.random()*1.0+0.15,
+  a:Math.random()*0.5+0.1,
+  da:(Math.random()-0.5)*0.0015,   /* very slow twinkle */
+  vx:(Math.random()-0.5)*0.012,    /* very slow drift */
+  vy:(Math.random()-0.5)*0.012,
+  gold:Math.random()<0.06
+}));
+(function drawBG(){
+  bgCX.clearRect(0,0,bgCV.width,bgCV.height);
+  bgStars.forEach(s=>{
+    s.a+=s.da;
+    if(s.a<0.06||s.a>0.65)s.da*=-1;
+    s.x+=s.vx; s.y+=s.vy;
+    if(s.x<0)s.x=bgCV.width; if(s.x>bgCV.width)s.x=0;
+    if(s.y<0)s.y=bgCV.height; if(s.y>bgCV.height)s.y=0;
+    bgCX.beginPath(); bgCX.arc(s.x,s.y,s.r,0,Math.PI*2);
+    bgCX.fillStyle=s.gold?`rgba(201,169,110,${s.a*0.6})`:`rgba(240,237,232,${s.a})`;
+    bgCX.fill();
+  });
+  requestAnimationFrame(drawBG);
+})();
+
+/* ── Panel switching ── */
+let current='home';
+function showPanel(id,btn){
+  if(id===current)return;
+  const oldP=document.getElementById('panel-'+current);
+  const newP=document.getElementById('panel-'+id);
+  oldP.classList.add('exit'); oldP.classList.remove('active');
+  setTimeout(()=>{oldP.classList.remove('exit'); newP.scrollTop=0;},380);
+  newP.classList.add('active');
+  current=id;
+  history.replaceState(null,'',id==='home'?location.pathname:'#'+id);
+  document.getElementById('sidebar').classList.remove('open');
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+}
+function showPanelByName(id){
+  const btn=[...document.querySelectorAll('.nav-item')].find(b=>b.getAttribute('onclick')?.includes("'"+id+"'"));
+  showPanel(id,btn);
+}
+function openFromHash(){const h=(location.hash.slice(1)||'home').toLowerCase();if(document.getElementById('panel-'+h))showPanelByName(h);}
+openFromHash(); window.addEventListener('hashchange',openFromHash);
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+function submitForm(e){
+  e.preventDefault();
+  const msg=document.getElementById('form-msg');
+  const name=document.getElementById('f-name').value.trim();
+  const from=document.getElementById('f-email').value.trim();
+  const body=document.getElementById('f-msg').value.trim();
+  window.location.href='mailto:behzadtahmaseb@gmail.com?subject='+encodeURIComponent('Message from '+name+' (website)')+'&body='+encodeURIComponent(body+'\n\n'+name+' <'+from+'>');
+  msg.style.display='block';
+  msg.textContent='Your email app should open with the message. If not, write to behzadtahmaseb@gmail.com.';
+}
+</script>
+</body>
+</html>
